@@ -1,0 +1,49 @@
+resource "aws_instance" "myprac-server" {
+    ami = data.aws_ami.latest-amazon-linux-image.id
+    instance_type = var.instance_type 
+    
+    #下面三个是optional 如果不设置的话会在默认的VPC里面设置 想要换VPC的话就要设置 不用指明VPC因为子网在那个VPC下
+    subnet_id = aws_subnet.myprac-subnet-1.id
+    vpc_security_group_ids = [aws_default_security_group.default-sg.id]
+    availability_zone = var.avail_zone #这一步可有可无 also之前子网设置过了
+
+    associate_public_ip_address = true #需要server有public ip因为要用网页访问或SSH
+    key_name = "0906-tfprac-key-pair"
+
+    #此处将TF用SSH connect到remote server 后面才能执行
+    connection {
+        type = "ssh"
+        host = self.public_ip #因为在这个EC2里面设置 所以可以self 代表this
+        user = "ec2-user"
+        private_key = file(var.public_key_location)
+    }
+
+    #将本地文件上传到VM
+    provisioner "file" {
+        source = "entry-script.sh"
+        destination = "/home/ec2-user/entry-script-on-ec2.sh"
+        /*如果想传这个到其他server 就在这个file provisioner里面做connection
+        connection {
+        type = "ssh"
+        host = otherserver.public_ip 
+        user = "ec2-user"
+        private_key = file(var.public_key_location)
+    }*/
+    }
+
+    provisioner "remote-exec" {
+        inline = file("entry-script-on-ec2.sh")
+        /*inline = [
+            "export ENV=prac",
+            "mkdir newdir"
+        ]*/
+    }
+
+    provisioner "local-exec" {
+        command = "echo ${self.public.ip} > output.txt"
+    }
+
+    tags = {
+        Name = "${var.env_prefix}-server"
+    }
+}

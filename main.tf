@@ -2,13 +2,6 @@ provider "aws" {
     region = "ap-southeast-2"
 }
 
-variable vpc_cidr_block {}
-variable subnet_cidr_block {}
-variable avail_zone{}
-variable env_prefix {}
-variable my_ip{}
-variable instance_type{}
-
 resource "aws_vpc" "myprac-vpc" {
     cidr_block = var.vpc_cidr_block
     tags = {
@@ -107,9 +100,6 @@ data "aws_ami" "latest-amazon-linux-image" {
     }
 }
 
-/*output "aws_ami_id" {
-    value = data.aws_ami.latest-amazon-linux-image
-}*/
 
 resource "aws_instance" "myprac-server" {
     ami = data.aws_ami.latest-amazon-linux-image.id
