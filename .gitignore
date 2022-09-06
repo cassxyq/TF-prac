@@ -12,5 +12,5 @@
 .terraformrc
 terraform.rc
 
-# Ignore Mac/OSX system file, which the folder metadata
-.DS_Store
+# ignore crash log
+crash.log
