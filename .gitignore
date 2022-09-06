@@ -1,0 +1,16 @@
+# Local .terraform directiories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# 排除所有tfvars文件 因为可能包含敏感数据比如私钥密码这种 永远不要将这类信息上传到git
+*.tfavrs
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore Mac/OSX system file, which the folder metadata
+.DS_Store
